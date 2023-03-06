@@ -1,9 +1,14 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
+import 'package:flutter_webapi_first_course/helpers/loggout.dart';
 import 'package:flutter_webapi_first_course/helpers/monthyear.dart';
 import 'package:flutter_webapi_first_course/helpers/weekday.dart';
 import 'package:flutter_webapi_first_course/models/journal.dart';
 import 'package:flutter_webapi_first_course/screens/commom/confirmation_dialog.dart';
+import 'package:flutter_webapi_first_course/screens/commom/exception_dialog.dart';
 import 'package:flutter_webapi_first_course/services/journal_service.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:uuid/uuid.dart';
 
 class JournalCard extends StatelessWidget {
@@ -173,6 +178,17 @@ class JournalCard extends StatelessWidget {
                   refreshFunction();
                 }
               },
+            ).catchError(
+              (error) {
+                logout(context);
+              },
+              test: (error) => error is TokenNotValidException,
+            ).catchError(
+              (error) {
+                var innerError = error as HttpException;
+                showExceptionDialog(context, content: innerError.message);
+              },
+              test: (error) => error is HttpException,
             );
           }
         }
