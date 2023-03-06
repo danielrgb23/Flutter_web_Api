@@ -28,7 +28,7 @@ class JournalService {
       },
       body: jsonJournal,
     );
-    if (response.statusCode == 201) {
+    if (response.statusCode != 201) {
       if (json.decode(response.body) == "jwt expired") {
         throw TokenNotValidException();
       }
@@ -38,6 +38,7 @@ class JournalService {
   }
 
   Future<bool> edit(String id, Journal journal, String token) async {
+    journal.updatedAt = DateTime.now();
     String jsonJournal = json.encode(journal.toMap());
 
     http.Response response = await client.put(
@@ -49,7 +50,7 @@ class JournalService {
       body: jsonJournal,
     );
 
-    if (response.statusCode == 200) {
+    if (response.statusCode != 200) {
       if (json.decode(response.body) == "jwt expired") {
         throw TokenNotValidException();
       }
